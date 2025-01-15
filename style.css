@@ -1,0 +1,27 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  background: white;
+}
+canvas {
+  display: block;
+}
+#lines{
+  color:white;
+  background:rgb(234,175,175);
+}
+#content {
+  white-space: nowrap;
+  outline:none;
+  border-top: 1px solid ;
+  border-bottom: 1px solid ;
+  border-image: linear-gradient(to right, #E6AFAF 0%, #FFFFFF 100%) 1;
+}
+#progressBar {
+  position: absolute;  /* Or 'fixed' for it to stay centered even during scroll */
+  top: 50%;            /* Position at the center vertically */
+  left: 50%;           /* Position at the center horizontally */
+  transform: translate(-50%, -50%); /* Adjust by half its own width/height to center it */
+  height: 20px;        /* Adjust height as needed */
+}
