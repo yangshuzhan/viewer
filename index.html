@@ -1,24 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@v0.172.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/",
-      "three/examples/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/"
+<head>
+  <meta charset="UTF-8">
+  <title>My 3D Models</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f0f0f0;
     }
-  }
-</script>
+    h1 {
+      margin-bottom: 1rem;
+    }
+    .links {
+      display: flex;
+      gap: 2rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
 
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8" />
+  <h1>Welcome to 3D Models Viewer</h1>
+  <div class="links">
+    <!-- Link or button to first viewer -->
+    <button onclick="window.location.href='viewer1.html'">
+      Go to Skeleton
+    </button>
 
-  </head>
-  <body>
-    <!-- <progress value="0" max="100" id="progressBar"></progress> -->
-    <main>
-    </main>
-    <script type="module" src="sketch.js"></script>
-  </body>
+    <!-- Link or button to second viewer -->
+    <button onclick="window.location.href='viewer2.html'">
+      Go to Intestines
+    </button>
+  </div>
+
+</body>
 </html>
