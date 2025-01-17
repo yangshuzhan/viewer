@@ -21,11 +21,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Add lighting
-const light = new THREE.PointLight(0xffffff, 10);
+const light = new THREE.PointLight(0xffffff, 2);
 light.position.set(1.8, 1.4, 1.0);
 scene.add(light);
 
-const ambientLight = new THREE.AmbientLight(0x404040);
+const ambientLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 scene.add(ambientLight);
 
 // Add controls
