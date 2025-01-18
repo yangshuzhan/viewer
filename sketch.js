@@ -13,7 +13,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(5));
 scene.background = new THREE.Color(0.5, 0.5, 0.5);
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.001, 10);
 camera.position.set(0.8, 1.4, 1.0);
 
 const renderer = new THREE.WebGLRenderer();
@@ -37,7 +37,15 @@ controls.target.set(0, 1, 0);
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let hoveredObject = null;
-
+controls.addEventListener('change', function () {
+  raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
+  let intersects = raycaster.intersectObjects(scene.children, true)
+  if (intersects.length > 0) {
+      if (intersects[0].distance <0.1) {
+        camera.position.copy(camera.position.multiplyScalar(1.2).addScaledVector(intersects[0].point,-0.2));
+        }
+      }
+})
 // Display hovered object's name
 const infoDiv = document.createElement('div');
 infoDiv.style.position = 'absolute';
@@ -56,6 +64,26 @@ function onMouseMove(event) {
   // Position the label next to the mouse pointer
   infoDiv.style.left = `${event.clientX + 10}px`; // Offset by 10px for better visibility
   infoDiv.style.top = `${event.clientY + 10}px`;
+  raycaster.setFromCamera(mouse, camera);
+  let intersects = raycaster.intersectObjects(scene.children, true);
+  if (intersects.length > 0) {
+    const firstIntersect = intersects[0].object;
+    if (hoveredObject !== firstIntersect) {//遇到一个新物体
+      if(hoveredObject&&hoveredObject.material.emissive)
+        hoveredObject.material.emissive.setHex( 0x000000);
+
+      hoveredObject = firstIntersect;
+      infoDiv.textContent = `Hovered: ${hoveredObject.name}`;
+      infoDiv.style.display='block'
+
+      if(hoveredObject.material.emissive)
+        hoveredObject.material.emissive.setHex( 0xFF0000);
+    }
+  
+  }
+  if(infoDiv.textContent=='Hovered: '){
+    infoDiv.style.display='none'
+  }
 }
 window.addEventListener('mousemove', onMouseMove);
 
@@ -123,29 +151,9 @@ gui.add(gtaoPass, 'output', {
 // Animation loop with raycasting
 function animate() {
   requestAnimationFrame(animate);
-
   // Raycast and check intersections
-  raycaster.setFromCamera(mouse, camera);
-  let intersects = raycaster.intersectObjects(scene.children, true);
-  if (intersects.length > 0) {
-    const firstIntersect = intersects[0].object;
-    if (hoveredObject !== firstIntersect) {//遇到一个新物体
-      if(hoveredObject&&hoveredObject.material.emissive)
-        hoveredObject.material.emissive.setHex( 0x000000);
+  
 
-      hoveredObject = firstIntersect;
-      infoDiv.textContent = `Hovered: ${hoveredObject.name}`;
-      infoDiv.style.display='block'
-
-      if(hoveredObject.material.emissive)
-        hoveredObject.material.emissive.setHex( 0xFF0000);
-    }
-    
-  }
-  if(infoDiv.textContent=='Hovered: '){
-    infoDiv.style.display='none'
-  }
-    
 
   controls.update();
   composer.render();
