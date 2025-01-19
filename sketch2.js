@@ -14,7 +14,7 @@ const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(5));
 scene.background = new THREE.Color(0.0, 0.0, 0.0);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0.8, 1.4, 1.0);
+camera.position.set(7, 0, -.9);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -32,12 +32,26 @@ scene.add(ambientLight);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.set(0, 1, 0);
+controls.zoomSpeed=0.1;
+controls.listenToKeyEvents( window );
+controls.keys = {
+	LEFT: 'ArrowLeft', //left arrow
+	UP: 'ArrowUp', // up arrow
+	RIGHT: 'ArrowRight', // right arrow
+	BOTTOM: 'ArrowDown' // down arrow
+}
+const raycaster = new THREE.Raycaster();
+controls.addEventListener('change', function () {
+  
+})
 
 // Load the GLTF model
 const loader = new GLTFLoader();
 loader.load(
   'model.glb',
   (gltf) => {
+    console.log(gltf)
+    // texture.colorSpace = THREE.SRGBColorSpace;
     const model = gltf.scene;
     model.scale.set(1, 1, 1);
     model.traverse((child) => {
@@ -79,16 +93,39 @@ const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-
+let lastdistance=0,lastcamera=camera.position;
 // Animation loop with raycasting
 function animate() {
   requestAnimationFrame(animate);
-
-  // Raycast and check intersections
-
-    
-  light.position.copy(camera.position);
   controls.update();
+  // Raycast and check intersections
+  raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
+  let intersects = raycaster.intersectObjects(scene.children, true)
+  let direction = new THREE.Vector3(); // create once and reuse it!
+    camera.getWorldDirection( direction );
+  if (intersects.length > 0) {
+    
+      if (intersects[0].distance <0.5) {
+        console.log(intersects[0])
+        camera.position.copy(camera.position.multiplyScalar(1.2).addScaledVector(intersects[0].point,-0.2));
+        console.log(intersects[0].distance,intersects[0].normal); 
+        }
+        
+      }
+  
+  raycaster.set(camera.position,direction.multiplyScalar(-1));
+  intersects = raycaster.intersectObjects(scene.children, true);
+  if (intersects.length > 0) {
+    
+    if (intersects[0].distance <0.5) {
+      console.log(intersects[0])
+      camera.position.copy(camera.position.multiplyScalar(1.2).addScaledVector(intersects[0].point,-0.2));
+      console.log(intersects[0].distance,intersects[0].normal); 
+      }
+      
+    }
+  light.position.copy(camera.position,direction);
+  
   composer.render();
   stats.update();
 }
