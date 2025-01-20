@@ -30,12 +30,13 @@ const ambientLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
 scene.add(ambientLight);
 
 // Add controls
-const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new FirstPersonControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.target.set(0, 0, 0);
+// controls.target.set(0, 0, 0);
 // controls.enableRotate=false;
 controls.zoomSpeed=0.1;
-controls.listenToKeyEvents( window );
+controls.movementSpeed=0.05;
+// controls.listenToKeyEvents( window );
 controls.keys = {
 	LEFT: 'ArrowLeft', //left arrow
 	UP: 'ArrowUp', // up arrow
@@ -99,7 +100,7 @@ let lastdistance=0,lastcamera=camera.position;
 // Animation loop with raycasting
 function animate() {
   requestAnimationFrame(animate);
-  controls.update();
+  controls.update(0.5);
   
   lastcamera=camera.position;
   console.log(camera.position)
@@ -111,7 +112,7 @@ function animate() {
     // console.log(direction)
     // controls.target=(camera.position);
   if (intersects.length > 0) {
-  controls.cursor.copy(intersects[0].point);
+  // controls.cursor.copy(intersects[0].point);
     
       if (intersects[0].distance <0.5) {
         console.log(intersects[0])
