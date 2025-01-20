@@ -7,21 +7,22 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
-
+import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 
 // Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(5));
 scene.background = new THREE.Color(0.0, 0.0, 0.0);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(7, 0, -.9);
+camera.position.set(1, 5.6, 5.9);
+
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Add lighting
-const light = new THREE.PointLight(0xffffff, 2);
+const light = new THREE.PointLight(0xffffff, 5);
 light.position.set(1.8, 1.4, 1.0);
 scene.add(light);
 
@@ -31,7 +32,8 @@ scene.add(ambientLight);
 // Add controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.target.set(0, 1, 0);
+controls.target.set(0, 0, 0);
+// controls.enableRotate=false;
 controls.zoomSpeed=0.1;
 controls.listenToKeyEvents( window );
 controls.keys = {
@@ -98,12 +100,18 @@ let lastdistance=0,lastcamera=camera.position;
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
+  
+  lastcamera=camera.position;
+  console.log(camera.position)
   // Raycast and check intersections
   raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
   let intersects = raycaster.intersectObjects(scene.children, true)
   let direction = new THREE.Vector3(); // create once and reuse it!
     camera.getWorldDirection( direction );
+    // console.log(direction)
+    // controls.target=(camera.position);
   if (intersects.length > 0) {
+  controls.cursor.copy(intersects[0].point);
     
       if (intersects[0].distance <0.5) {
         console.log(intersects[0])
