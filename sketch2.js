@@ -26,7 +26,7 @@ const light = new THREE.PointLight(0xffffff, 5);
 light.position.set(1.8, 1.4, 1.0);
 scene.add(light);
 
-const ambientLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+const ambientLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 0.1 );
 scene.add(ambientLight);
 
 // Add controls
@@ -59,6 +59,11 @@ loader.load(
     model.scale.set(1, 1, 1);
     model.traverse((child) => {
       if (child.isMesh) {
+        console.log(child.material)
+        child.material.bumpMap=new THREE.TextureLoader().load('IntestinesB.jpg' ); 
+        child.material.map.anisotropy=renderer.capabilities.getMaxAnisotropy() 
+        child.material.map.minFilter=THREE.NearestFilter
+        child.material.map.maxFilter=THREE.LinearFilter
         child.name = child.name || `Object_${child.id}`; // Ensure objects have unique names
       }
     });
@@ -81,6 +86,7 @@ loader.load(
 // Add stats
 const stats = new Stats();
 document.body.appendChild(stats.dom);
+let point=document.getElementById('point');
 
 // Handle window resize
 function onWindowResize() {
@@ -98,12 +104,13 @@ composer.addPass(renderPass);
 
 let lastdistance=0,lastcamera=camera.position;
 // Animation loop with raycasting
+let minx=Infinity,maxx=0
 function animate() {
   requestAnimationFrame(animate);
   controls.update(0.5);
   
   lastcamera=camera.position;
-  console.log(camera.position)
+  // console.log(camera.position)
   // Raycast and check intersections
   raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
   let intersects = raycaster.intersectObjects(scene.children, true)
@@ -134,8 +141,13 @@ function animate() {
       
     }
   light.position.copy(camera.position,direction);
-  
+  point.style.right=(camera.position.x+11.7)/24*300+'px';
+  point.style.bottom=(camera.position.y+19.9)/32*200+'px';
   composer.render();
+  if(camera.position.y<minx)minx=camera.position.y
+  if(camera.position.y>maxx)maxx=camera.position.y
+  // console.log(minx,maxx)
+  
   stats.update();
 }
 animate();
