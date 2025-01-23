@@ -62,11 +62,11 @@ loader.load(
     model.traverse((child) => {
       if (child.isMesh) {
         console.log(child)
-        let temp=new THREE.MeshPhongMaterial
-        temp.map=child.material.map
-        child.material=temp;
-        child.material.shininess=300
-        child.material.specular=new THREE.Color(.5, .5, .5);
+        // let temp=new THREE.MeshPhongMaterial
+        // temp.map=child.material.map
+        child.material.roughness=0.1;
+        // child.material.shininess=300
+        // child.material.specular=new THREE.Color(.5, .5, .5);
 
         child.material.bumpMap=new THREE.TextureLoader().load('IntestinesB.jpg' );
         child.material.bumpScale=1
