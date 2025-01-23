@@ -13,7 +13,7 @@ import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.j
 const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(5));
 scene.background = new THREE.Color(0.0, 0.0, 0.0);
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 20);
 camera.position.set(1, 5.6, 5.9);
 
 
@@ -23,11 +23,13 @@ document.body.appendChild(renderer.domElement);
 
 // Add lighting
 const light = new THREE.PointLight(0xffffff, 5);
+light.castShadow=false;
 light.position.set(1.8, 1.4, 1.0);
 scene.add(light);
 
-const ambientLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 0.1 );
+const ambientLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 0.01 );
 scene.add(ambientLight);
+light.shadow.camera=camera;
 
 // Add controls
 const controls = new FirstPersonControls(camera, renderer.domElement);
@@ -59,11 +61,18 @@ loader.load(
     model.scale.set(1, 1, 1);
     model.traverse((child) => {
       if (child.isMesh) {
-        console.log(child.material)
-        child.material.bumpMap=new THREE.TextureLoader().load('IntestinesB.jpg' ); 
-        child.material.map.anisotropy=renderer.capabilities.getMaxAnisotropy() 
-        child.material.map.minFilter=THREE.NearestFilter
-        child.material.map.maxFilter=THREE.LinearFilter
+        console.log(child)
+        let temp=new THREE.MeshPhongMaterial
+        temp.map=child.material.map
+        child.material=temp;
+        child.material.shininess=300
+        child.material.specular=new THREE.Color(.5, .5, .5);
+
+        child.material.bumpMap=new THREE.TextureLoader().load('IntestinesB.jpg' );
+        child.material.bumpScale=1
+        // child.material.map.anisotropy=renderer.capabilities.getMaxAnisotropy() 
+        // child.material.map.minFilter=THREE.NearestFilter
+        // child.material.map.maxFilter=THREE.LinearFilter
         child.name = child.name || `Object_${child.id}`; // Ensure objects have unique names
       }
     });
@@ -141,6 +150,7 @@ function animate() {
       
     }
   light.position.copy(camera.position,direction);
+  // console.log(light.shadow.camera.position)
   point.style.right=(camera.position.x+11.7)/24*300+'px';
   point.style.bottom=(camera.position.y+19.9)/32*200+'px';
   composer.render();
