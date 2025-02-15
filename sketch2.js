@@ -3,11 +3,12 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 // Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
@@ -27,29 +28,51 @@ light.castShadow=false;
 light.position.set(1.8, 1.4, 1.0);
 scene.add(light);
 
-const ambientLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 0.01 );
+const ambientLight = new THREE.HemisphereLight( 0xcf5f2b, 0xcf5f2b, 0.1 );
 scene.add(ambientLight);
 light.shadow.camera=camera;
 
 // Add controls
-const controls = new FirstPersonControls(camera, renderer.domElement);
-controls.enableDamping = true;
-// controls.target.set(0, 0, 0);
-// controls.enableRotate=false;
-controls.zoomSpeed=0.1;
-controls.movementSpeed=0.05;
-// controls.listenToKeyEvents( window );
-controls.keys = {
-	LEFT: 'ArrowLeft', //left arrow
-	UP: 'ArrowUp', // up arrow
-	RIGHT: 'ArrowRight', // right arrow
-	BOTTOM: 'ArrowDown' // down arrow
-}
-const raycaster = new THREE.Raycaster();
-controls.addEventListener('change', function () {
-  
-})
+const controls = new PointerLockControls( camera, renderer.domElement );
 
+// add event listener to show/hide a UI (e.g. the game's menu)
+
+// controls.addEventListener( 'lock', function () {
+
+// 	menu.style.display = 'none';
+
+// } );
+
+// controls.addEventListener( 'unlock', function () {
+
+// 	menu.style.display = 'block';
+
+// } );
+const raycaster = new THREE.Raycaster();
+const onKeyDown = function (event) {
+  let direction=controls.getDirection(new THREE.Vector3())
+  switch (event.code) {
+    case 'KeyW':
+      camera.position.addScaledVector( camera.getWorldDirection( direction ), 0.05 );
+      break;
+    case 'KeyA': 
+      controls.moveRight(-0.05);
+      break;
+    case 'KeyS':
+      controls.moveForward(-0.05);
+      break;
+    case 'KeyD':
+      controls.moveRight(0.05);
+      break;
+      case 'KeyZ':
+      controls.lock()
+      break;
+  }
+};
+document.addEventListener('keydown', onKeyDown, false)
+onclick = (event) => {
+  controls.lock()
+};
 // Load the GLTF model
 const loader = new GLTFLoader();
 loader.load(
@@ -68,8 +91,28 @@ loader.load(
         // child.material.shininess=300
         // child.material.specular=new THREE.Color(.5, .5, .5);
 
-        child.material.bumpMap=new THREE.TextureLoader().load('IntestinesB.jpg' );
+        new THREE.TextureLoader().load('IntestinesC.jpg', function (texture) {  // 加载成功后的回调函数
+          child.material.map=texture;
+          texture.colorSpace='srgb';
+          texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 1);
+  texture.flipY=false
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+        });
+        new THREE.TextureLoader().load('IntestinesB.jpg',  function (texture) {  // 加载成功后的回调函数
+          child.material.bumpMap=texture;
+          texture.colorSpace='srgb';
+          texture.wrapS = THREE.RepeatWrapping;
+texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 1);
+  texture.flipY=false
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+        });
         child.material.bumpScale=1
+        child.material.needsUpdate=true;
         // child.material.map.anisotropy=renderer.capabilities.getMaxAnisotropy() 
         // child.material.map.minFilter=THREE.NearestFilter
         // child.material.map.maxFilter=THREE.LinearFilter
