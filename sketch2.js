@@ -64,15 +64,33 @@ const onKeyDown = function (event) {
     case 'KeyD':
       controls.moveRight(0.05);
       break;
-      case 'KeyZ':
+    case 'KeyZ':
       controls.lock()
       break;
   }
 };
 document.addEventListener('keydown', onKeyDown, false)
-onclick = (event) => {
-  controls.lock()
-};
+let isLeftMouseDown = false;
+let isRightMouseDown = false;
+
+// 监听鼠标按下
+document.addEventListener('mousedown', (event) => {
+  if (event.button === 0) {       // 左键
+    controls.lock()
+    isLeftMouseDown = true;
+  } else if (event.button === 2) { // 右键
+    isRightMouseDown = true;
+  }
+});
+
+// 监听鼠标抬起
+document.addEventListener('mouseup', (event) => {
+  if (event.button === 0) {
+    isLeftMouseDown = false;
+  } else if (event.button === 2) {
+    isRightMouseDown = false;
+  }
+});
 // Load the GLTF model
 const loader = new GLTFLoader();
 loader.load(
@@ -160,7 +178,18 @@ let minx=Infinity,maxx=0
 function animate() {
   requestAnimationFrame(animate);
   controls.update(0.5);
-  
+  if (isLeftMouseDown) {
+    // 例如，让相机向前移动
+    let direction = controls.getDirection(new THREE.Vector3());
+    camera.position.addScaledVector(camera.getWorldDirection(direction), 0.05);
+  }
+
+  // 如果右键被按住，就执行另一段逻辑
+  if (isRightMouseDown) {
+    // 例如，让相机向后移动
+    let direction = controls.getDirection(new THREE.Vector3());
+    camera.position.addScaledVector(camera.getWorldDirection(direction), -0.05);
+  }
   lastcamera=camera.position;
   // console.log(camera.position)
   // Raycast and check intersections
