@@ -129,7 +129,7 @@ texture.wrapT = THREE.RepeatWrapping;
   texture.minFilter = THREE.LinearFilter;
   texture.magFilter = THREE.LinearFilter;
         });
-        child.material.bumpScale=1
+        child.material.bumpScale=5
         child.material.needsUpdate=true;
         // child.material.map.anisotropy=renderer.capabilities.getMaxAnisotropy() 
         // child.material.map.minFilter=THREE.NearestFilter
